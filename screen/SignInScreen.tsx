@@ -1,16 +1,18 @@
-import Button from "@/components/Button";
-import Input, {
-  IconNames,
-  KeyboardTypes,
-  ReturnKeyTypes,
-} from "../components/Input";
-import SafeInputView from "@/components/SafeInputView";
 import { useEffect, useRef, useState } from "react";
 import { Alert, Image, Keyboard, StyleSheet, View } from "react-native";
 import signIn from "@/api/auth";
 import PropTypes from "prop-types";
+import SafeInputView from "@/components/SafeInputView";
+import Input, {
+  IconNames,
+  KeyboardTypes,
+  ReturnKeyTypes,
+} from "@/components/Input";
+import Button from "@/components/Button";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const SignInScreen = ({ navigation }: any) => {
+  const insets = useSafeAreaInsets();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const passwordRef = useRef(null);
@@ -18,34 +20,31 @@ const SignInScreen = ({ navigation }: any) => {
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    navigation.setOptions({
-      constentStyle: { bacgroundcolor: "red" },
-    });
-  }, [navigation]);
-
-  useEffect(() => {
     setDisabled(!email || !password);
   }, [email, password]);
 
   const onSubmit = async () => {
     if (!isLoading && !disabled) {
+      setIsLoading(true); // 요청 전에 로딩 상태를 true로 설정합니다.
       try {
         Keyboard.dismiss();
         const data = await signIn(email, password);
-        setIsLoading(false);
         navigation.navigate("List");
       } catch (e) {
-        Alert.alert("로그인 실패", e, [
-          { text: "확인", onPress: () => setIsLoading(false) },
-        ]);
+        Alert.alert(
+          "로그인 실패",
+          e.message || "알 수 없는 오류가 발생했습니다.",
+          [{ text: "확인", onPress: () => {} }]
+        );
+      } finally {
+        setIsLoading(false); // 요청 완료 후 로딩 상태를 false로 설정합니다.
       }
-      setIsLoading(false);
     }
   };
 
   return (
     <SafeInputView>
-      <View style={styles.container}>
+      <View style={[styles.container, { paddingTop: insets.top }]}>
         <Image
           source={require("../assets/images/main.png")}
           style={styles.image}

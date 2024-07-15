@@ -15,7 +15,7 @@ const Button = ({ title, onPress, disabled, isLoading }: props) => {
       onPress={onPress}
       style={({ pressed }) => [
         styles.container,
-        pressed && { backgroundColor: PRIMARY.DARK },
+        pressed && !disabled && { backgroundColor: PRIMARY.DARK },
         disabled && { backgroundColor: PRIMARY.LIGHT, opacity: 0.6 },
       ]}
       disabled={disabled}
@@ -32,8 +32,13 @@ const Button = ({ title, onPress, disabled, isLoading }: props) => {
 Button.propTypes = {
   title: PropTypes.string.isRequired,
   onPress: PropTypes.func.isRequired,
-  disable: PropTypes.bool,
-  isLoaded: PropTypes.bool,
+  disabled: PropTypes.bool,
+  isLoading: PropTypes.bool,
+};
+
+Button.defaultProps = {
+  disabled: false,
+  isLoading: false,
 };
 
 const styles = StyleSheet.create({
